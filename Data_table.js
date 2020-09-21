@@ -5,13 +5,57 @@ class Data_Table {
         this.table_name = table_name;
         this.header = "";
         this.rows = [];
-        this.fancy = [];
+        this.table = "";
+        this.json_fancy = [];
+        this.json_raw = [];
+        this.table_raw = [];
+        this.keys = [];
     }
-    async init() {
-        this.fancy = await this.get_json_fancy(this.table_name);
-        const { output, header, rows } = this.obj_list_to_table_string(this.fancy);
-        this.header = header;
-        this.rows = rows;
+    async get_content_from_server() {
+        let query_string = "*";
+        switch (this.table_name) {
+            case "employee":
+                query_string = `SELECT e.id, 
+                e.first_name AS First_Name, 
+                e.last_name AS Last_Name, 
+                title AS Title, 
+                salary AS Salary, 
+                name AS Department,
+                CONCAT(m.first_name, " ", m.last_name) AS Manager
+                 FROM employee e
+                 LEFT JOIN employee m ON e.manager_id = m.id 
+                 INNER JOIN role r ON e.role_id = r.role_id 
+                 INNER JOIN department d ON r.department_id = d.department_id`
+                break;
+            case "role":
+                query_string = `SELECT r.role_id as id, 
+                r.title AS Title, 
+                r.salary AS Salary, 
+                d.name AS Department 
+                FROM role r
+                INNER JOIN department d ON r.department_id = d.department_id`
+                break;
+            case "department":
+                query_string = `SELECT department_id as id,name as Department_Name from department`
+                break;
+        }
+        try {
+            const json_fancy = JSON.parse(JSON.stringify(await this.query(query_string)));
+            const table_raw = await this.query(`SELECT * FROM ${this.table_name}`);
+            const json_raw = JSON.parse(JSON.stringify(table_raw));
+            this.keys = Object.keys(json_raw[0]);
+            this.id_name = this.keys[0];
+            const { output, header, rows } = this.obj_list_to_table_string(json_fancy);
+            this.json_fancy = json_fancy;
+            this.json_raw = json_raw;
+            this.header = header;
+            this.rows = rows;
+            this.table = output;
+            this.table_raw = table_raw;
+        } catch (err) {
+            console.log("err in getting content\n")
+            throw err
+        };
         return this;
     }
     verify_type(column_types_list, input_list) {
@@ -63,51 +107,16 @@ class Data_Table {
         }).join('\n');
         return { output: output, header: header_line, rows: list_row_lines_raw };
     }
-    async get_json_fancy(table_name) {
-        let query_string = "*";
-        switch (table_name) {
-            case "employee":
-                query_string = `SELECT e.id, 
-                e.first_name AS First_Name, 
-                e.last_name AS Last_Name, 
-                title AS Title, 
-                salary AS Salary, 
-                name AS Department,
-                CONCAT(m.first_name, " ", m.last_name) AS Manager
-                 FROM employee e
-                 LEFT JOIN employee m ON e.manager_id = m.id 
-                 INNER JOIN role r ON e.role_id = r.role_id 
-                 INNER JOIN department d ON r.department_id = d.department_id`
-                break;
-            case "role":
-                query_string = `SELECT r.role_id as id, 
-                r.title AS Title, 
-                r.salary AS Salary, 
-                d.name AS Department 
-                FROM role r
-                INNER JOIN department d ON r.department_id = d.department_id`
-                break;
-            case "department":
-                query_string = `SELECT department_id as id,name as Department_Name from department`
-                break;
-        }
-        try {
-            return JSON.parse(JSON.stringify(await this.query(query_string)));
-        } catch (err) { throw err };
-    }
     get_table() {
-        try {
-            return this.obj_list_to_table_string(this.fancy).output;
-        } catch (err) { console.log(err); }
+        return this.table;
     }
-    async get_table_raw() {
-        try {
-            return await this.query(`SELECT * FROM ${this.table_name}`);
-        } catch (err) { console.log(err); }
+    get_table_raw() {
+        return this.table_raw;
     }
-    async remove_element_by_id(id_name, id) {
+    async remove_element_by_id(id) {
         try {
-            return await this.query(`delete from ${this.table_name} where ${id_name}=${id}`)
+            await this.query(`delete from ${this.table_name} where ${this.id_name}=${id}`)
+            return await this.get_content_from_server();
         } catch (err) { console.log(err); }
     }
     async add_element(elementObj) {
@@ -125,14 +134,15 @@ class Data_Table {
                 console.log('err: add_element(): columns do not match');
                 return;
             }
-            const output = this.query(`INSERT INTO ${this.table_name} SET ?`, elementObj);
-            return output;
+            await this.query(`INSERT INTO ${this.table_name} SET ?`, elementObj);
+            return await this.get_content_from_server();
         } catch (err) { console.log(err); }
     }
-    async update_element_by_column(id_name, id, database_column, value) {
+    async update_value_by_id_column(value, id, database_column) {
         try {
             // console.log(`Test: updating ${this.table_name} row with ${id_name} ${id} column ${database_column} with (${value})\n`);
-            return await this.query(`UPDATE ${this.table_name} SET ${database_column} = ${value} WHERE  ${id_name} = ${id}`);
+            await this.query(`UPDATE ${this.table_name} SET ${database_column} = ${value} WHERE  ${this.id_name} = ${id}`);
+            return await this.get_content_from_server(); //update value;
         } catch (err) { console.log(err); }
     }
 }
