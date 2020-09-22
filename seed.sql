@@ -10,7 +10,7 @@ CREATE TABLE department (
 CREATE TABLE role (
   role_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(30) NULL,
-  salary DECIMAL(20,2),
+  salary DECIMAL(36,2),
   department_id INT
 );
 CREATE TABLE employee (
@@ -23,8 +23,10 @@ CREATE TABLE employee (
 
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("clyde","r",1,NULL),("r","0",1,1);
+VALUES ("ya","boi",1,1),("claus","dominica",2,1),("john","doe",3,2);
 INSERT INTO role(title,salary,department_id)
-VALUES ("supreme overlord",10000.2345678,1);
+VALUES ("Server Master",10000000000100.12,1),("Server Manager",10000,1),("worker",1000,2);
 INSERT INTO department (name)
-VALUES ("admin");
+VALUES ("admin"),("pesant");
+
+
