@@ -128,6 +128,7 @@ class Data_Table {
         try {
             const database_column = this.keys.slice(1)[column_index];
             await this.query(`UPDATE ${this.table_name} SET ${database_column} = '${value}' WHERE  ${this.id_name} = ${id};`);
+            return this.get_content_from_server();
         } catch (err) { console.log(err); }
     }
     async sort_by_column(column_index) {

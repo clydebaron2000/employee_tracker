@@ -16,7 +16,7 @@
 
 This project utilizes `node.js` and `npm` to create a employee manager within the command line. After a series of prompts, the user will be able to view and modify tables within a `mysql` database.
 
-<img src='./Develop/img/demo.gif' alt='Gif Demo'>
+<img src='./img/demo.gif' alt='Gif Demo' style="height:500px">
 
 ---
 ## Table of Contents 

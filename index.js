@@ -43,7 +43,7 @@ async function view_rearrange_menu(data_table) {
 }
 async function add_row(data_table) {
     //display table
-    console.log(chalk `Displaying raw table {yellow.bold ${data_table.table_name}}:\n${data_table.obj_list_to_table_string(data_table.json_raw)}\n`);
+    console.log(chalk `Displaying raw table {yellow.bold ${data_table.table_name}}:\n${data_table.obj_list_to_table_string(data_table.json_raw).output}\n`);
     switch (data_table.table_name) { //fork to individual tables
         case "employee":
             return await add_to_employee(data_table);
@@ -73,7 +73,7 @@ async function add_to_employee(e) {
         name: "role_id",
         message: chalk `What {yellow.bold role} does employee have?`,
         choices: r.rows_raw, //display rows of the roles (type of roles and salary)
-        filter: (choice) => r.json_fancy[r.rows.indexOf(choice)].id //get the id
+        filter: (choice) => r.json_fancy[r.rows_raw.indexOf(choice)].id //get the id
     }, {
         type: "list",
         name: "manager_id",
@@ -144,6 +144,7 @@ async function modify_value(data_table) {
             message: chalk `Which {yellow.bold column} would you like to modify?\n  ${data_table.header_raw}\n  ${data_table.rows_raw[row_index]}`,
             filter: (choice) => data_table.keys.slice(1).indexOf(choice)
         });
+        const id = data_table.json_fancy[row_index].id;
         let value_q; //switch statment if taking the column types at the column index and cutting off anything after the '('
         switch (data_table.column_types[col_index].slice(0, data_table.column_types[col_index].indexOf('('))) {
             case "varchar":
@@ -162,7 +163,7 @@ async function modify_value(data_table) {
                     message: chalk `What is the {yellow.bold integer value} you want for this location?`,
                     validate: (input) => {
                         if (isNaN(parseInt(input)) || parseInt(input) != parseFloat(input)) return 'err: not an integer. please enter an integer';
-                        switch (data_table.keys[col_index]) {
+                        switch (data_table.keys.slice(1)[col_index]) {
                             case "manager_id":
                                 if (e.json_fancy.map(obj => obj.id).includes(parseInt(input))) return true;
                                 break;
@@ -175,7 +176,7 @@ async function modify_value(data_table) {
                             default:
                                 break;
                         }
-                        return `err: not a valid ${data_table.keys[col_index]}, try again.`;
+                        return `err: not a valid ${data_table.keys.slice(1)[col_index]}, try again.`;
                     },
                     filter: parseInt
                 }
