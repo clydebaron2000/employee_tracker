@@ -23,10 +23,27 @@ CREATE TABLE employee (
 
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("ya","boi",1,1),("claus","dominica",2,1),("john","doe",3,2);
+VALUES ("Noel","Joel",1,1),("Mateo","Ergi",2,1),
+("Sullivan","Chadwick",3,2),
+("Stevie","Haynes",4,2),
+("Zac","Nava",5,2),
+
+("Kellie","Whitley",6,4),("Bjorn","Wright",7,4),("Alexis","Kinney",8,4),
+("Billie","Sharp",9,5),("Enrico","Knowles",10,3),("Opal","Barrow",11,3),
+("Patrick","Brett",12,11),("Colette","BlackBurn",7,4),("Sydnay","Woodcock",6,4),
+("Eamon","Mcniel",12,11)
+;
 INSERT INTO role(title,salary,department_id)
-VALUES ("Server Master",10000000000100.12,1),("Server Manager",10000,1),("worker",1000,2);
+VALUES ("Founder",300000000,1),("CEO",10000000,1),
+("Sales Head",250000,2),
+("Head Engineer",300000,3),
+("Head of Marketing",300000,4),
+
+("Advisor",15000,3),("UX Designer",25000,3),("Programmer",25000,3),
+("Associate Marketer",15000,4),("Sales Associate",15000,2),
+("Sales Manager",15000,2),("Customer Service Rep",13000,2)
+;
 INSERT INTO department (name)
-VALUES ("admin"),("pesant");
+VALUES ("Executive"),("Sales"),("Engineering"),("Marketing");
 
 

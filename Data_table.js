@@ -1,10 +1,10 @@
 const chalk = require("chalk");
 class Data_Table {
     constructor(query, table_name) {
-        this.query = query;
-        this.table_name = table_name;
+        this.query = query; //set query function with bounded 'connection'
+        this.table_name = table_name; //table name
         let query_string = "*";
-        switch (this.table_name) {
+        switch (this.table_name) { //determine fancy qeury string
             case "employee":
                 query_string = `SELECT e.id as id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager
                  FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.role_id INNER JOIN department d ON r.department_id = d.department_id`
@@ -23,12 +23,12 @@ class Data_Table {
         try {
             const json_fancy = JSON.parse(JSON.stringify(await this.query(this.fancy_query_string)));
             const json_raw = JSON.parse(JSON.stringify(await this.query(`SELECT * FROM ${this.table_name}`)));
-            this.store_json_to_values(json_fancy, json_raw);
+            this.store_json_to_values(json_fancy, json_raw); //more assignment in this function
             //following values don't change unless table changes
+            this.column_types = JSON.parse(JSON.stringify(await this.query(`SHOW FIELDS FROM ${this.table_name}`))).map(column_obj => column_obj.Type).slice(1);
             this.column_names = Object.keys(json_fancy[0]);
             this.keys = Object.keys(json_raw[0]);
             this.id_name = this.keys[0];
-            this.column_types = JSON.parse(JSON.stringify(await this.query(`SHOW FIELDS FROM ${this.table_name}`))).map(column_obj => column_obj.Type).slice(1);
             return this;
         } catch (err) {
             console.log("err in getting content\n")
@@ -37,20 +37,18 @@ class Data_Table {
     }
     store_json_to_values(json_fancy, json_raw) {
         var { output, header, rows } = this.obj_list_to_table_string(json_fancy);
-        this.json_fancy = json_fancy;
+        this.json_fancy = json_fancy; //assignement to fancy
         this.header = header;
         this.rows = rows;
         this.table = output;
         var { output, header, rows } = this.obj_list_to_table_string(json_raw);
-        this.json_raw = json_raw;
+        this.json_raw = json_raw; //assignment for raws
         this.table_raw = output;
         this.header_raw = header;
         this.rows_raw = rows;
     }
     verify_type(column_types_list, input_list) {
-        if (column_types_list.length != input_list.length) {
-            throw `err: verify_type(): list inputs do not have the same length\ncolumn_types_list: ${column_types_list.length}\n input_list: ${input_list.length}`;
-        }
+        if (column_types_list.length != input_list.length) throw `err: verify_type(): list inputs do not have the same length\ncolumn_types_list: ${column_types_list.length}\n input_list: ${input_list.length}`;
         let i = 0,
             bool_array = [],
             type_array = [];
@@ -140,7 +138,7 @@ class Data_Table {
                 ordered_json_raw.push(this.json_raw.find((element) => element[this.id_name] === row.id));
             });
             this.store_json_to_values(ordered_json_fancy, ordered_json_raw);
-            return output;
+            return this.table;
         } catch (err) {
             throw err;
         }
