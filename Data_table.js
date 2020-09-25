@@ -81,19 +81,17 @@ class Data_Table {
                 return el;
             });
         });
-        let i = 0,
+        let row_index = 0,
             header_line, list_row_lines_raw = [];
-        let output = ([...Array(input_obj_list.length + 1)].map(empty => i++)).map(i => {
+        let output = ([...Array(input_obj_list.length + 1)].map(empty => row_index++)).map(i => {
             let color;
-            if (i === 0) color = "yellow.bold";
-            else if (i % 2 === 1) color = "gray.bold";
-            else color = "white.bold"
-            let content_styled = chart_matrix.map(column => chalk `{${color} ${column[i]}}`).join(" | ");
+            if (i === 0) color = "yellow.bold.bgBlack";
+            else if (i % 2 === 1) color = "rgb(20, 20, 20).bgWhite.inverse";
+            else color = "rgb(30, 30, 30).bgWhite.inverse";
+            let content_styled = chart_matrix.map(column => chalk `{${color} ${column[i]}}`).join(chalk `{${color}  | }`);
             let content_raw = chart_matrix.map(column => column[i]).join(" | ");
-            if (i === 0) {
-                header_line = content_styled;
-                content_styled += '\n' + [...Array(content_raw.length)].map(empty => "-").join('');
-            } else list_row_lines_raw.push(content_raw);
+            if (i === 0) header_line = content_styled;
+            else list_row_lines_raw.push(content_raw);
             return content_styled;
         }).join('\n');
         return { output: output, header: header_line, rows: list_row_lines_raw };

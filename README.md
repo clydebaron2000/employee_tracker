@@ -16,6 +16,12 @@
 
 This project utilizes `node.js` and `npm` to create a employee manager within the command line. After a series of prompts, the user will be able to view and modify tables within a `mysql` database.
 
+Row distinctions have been recolored! here is what the current code looks like in the CLI:
+
+<img src='./img/new_colors.PNG' alt='Gif Demo' style="height:500px">
+
+Here's a demonstration of the codes functionality with the old colors:
+
 <img src='./img/demo.gif' alt='Gif Demo' style="height:500px">
 
 ---
